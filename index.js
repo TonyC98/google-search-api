@@ -1,24 +1,29 @@
 //import express, cors and mongodb
-const express = require('express')
-const cors = require('cors')
-const { MongoClient } = require('mongodb')
+const express = require("express");
+const cors = require("cors");
+const { MongoClient } = require("mongodb");
+
+//require dotenv
+require("dotenv").config();
 
 //run the express and cors functions
-const app = express()
-app.use(cors())
-const client = new MongoClient(
-  'mongodb+srv://antocaricati98:7yj0nEzIuUIC7G6r@cluster0.zhl5dbi.mongodb.net/google-search'
-)
+const app = express();
+app.use(cors());
+const client = new MongoClient(process.env.DATABASE_CONNECTION);
+// const client = new MongoClient(
+//   "mongodb+srv://antocaricati98:7yj0nEzIuUIC7G6r@cluster0.zhl5dbi.mongodb.net/google-search"
+// );
+
 //mongodb configuration
-const db = client.db('google-search')
-const Results = db.collection('results')
-console.log(Results)
+const db = client.db("google-search");
+const Results = db.collection("results");
+console.log(Results);
 
 //create results route to read data from mongodb database
-app.get('/results', async (req, res) => {
-  await client.connect()
+app.get("/results", async (req, res) => {
+  await client.connect();
   // Get all the results
-  let results = await Results.find({}).toArray()
+  let results = await Results.find({}).toArray();
 
   // Filter data searched
   let filteredData = results.filter(
@@ -29,14 +34,14 @@ app.get('/results', async (req, res) => {
         .includes(req.query.search.toLowerCase()) ||
       element.url.toLowerCase().includes(req.query.search.toLowerCase()) ||
       element.links.includes(req.query.search)
-  )
+  );
   // Send filtered results
-  res.send(filteredData)
-})
+  res.send(filteredData);
+});
 //create root route
-app.get('/', (req, res) => {
-  res.send('Welcome to Google Search')
-})
+app.get("/", (req, res) => {
+  res.send("Welcome to Google Search");
+});
 
 //create results route of type get
 // app.get('/results', (req, res) => {
@@ -77,5 +82,5 @@ app.get('/', (req, res) => {
 
 //keep the server active
 app.listen(4000, () => {
-  console.log('active server')
-})
+  console.log("active server");
+});
